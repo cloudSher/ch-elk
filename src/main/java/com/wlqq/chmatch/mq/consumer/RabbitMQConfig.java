@@ -4,6 +4,10 @@ package com.wlqq.chmatch.mq.consumer;
  * Created by wei.zhao on 2017/9/26.
  */
 
+import org.springframework.amqp.core.Binding;
+import org.springframework.amqp.core.BindingBuilder;
+import org.springframework.amqp.core.FanoutExchange;
+import org.springframework.amqp.core.Queue;
 import org.springframework.amqp.rabbit.connection.CachingConnectionFactory;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Bean;
@@ -16,8 +20,7 @@ public class RabbitMQConfig {
     private String username;
     private String password;
     private String virtualHost;
-    private String host;
-    private Integer port;
+    private String address;
 
     public String getUsername() {
         return username;
@@ -37,15 +40,27 @@ public class RabbitMQConfig {
         CachingConnectionFactory factory = new CachingConnectionFactory();
         factory.setUsername(username);
         factory.setPassword(password);
-        factory.setHost(host);
-        factory.setPort(port);
+        factory.setAddresses(address);
         factory.setVirtualHost(virtualHost);
         return factory;
     }
 
 
+    @Bean
+    public FanoutExchange exchange(){
+        return new FanoutExchange("",true,false);
+    }
 
 
+    @Bean
+    public Queue queue(){
+        return new Queue("",true);
+    }
+
+    @Bean
+    public Binding exchangeBind(){
+        return BindingBuilder.bind(queue()).to(exchange());
+    }
 
 
 }
